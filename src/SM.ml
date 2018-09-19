@@ -36,7 +36,7 @@ let eval_instr (sk, (mp, i, o)) instr = match instr with
                                  | []          -> failwith "not enough input"
                                end
                  | WRITE    -> begin match sk with
-                                 | x :: sk_tail -> (sk_tail, (mp, i, x :: o))
+                                 | x :: sk_tail -> (sk_tail, (mp, i, o @ [x]))
                                  | []           -> failwith "not enough stack"
                                end
                  | LD var   -> (mp var :: sk, (mp, i, o))

@@ -97,7 +97,7 @@ module Stmt =
                               | x :: tl -> (Expr.update var x mp, tl, o)
                               | []      -> failwith "not enough input"
                             end
-      | Write ex         -> (mp, i, (Expr.eval mp ex) :: o)
+      | Write ex         -> (mp, i, o @ [Expr.eval mp ex])
       | Assign (var, ex) -> (Expr.update var (Expr.eval mp ex) mp, i, o)
       | Seq (st1, st2)   -> let new_conf = eval (mp, i, o) st1 in
                               eval new_conf st2
