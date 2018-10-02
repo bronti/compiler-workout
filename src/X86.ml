@@ -93,6 +93,7 @@ let rec compile env = function
       | "==" -> "e"
       | "!=" -> "ne"
       | _    -> failwith "):"
+    in
     let env, asm =
       match instr with
       | CONST n ->
@@ -113,8 +114,8 @@ let rec compile env = function
       | ST x ->
         let s, env = (env#global x)#pop in
         env, (match s with
-                | S _ -> [Mov s, eax); Mov (eax, (M (env#loc x))]
-                | R _ -> [Mov (s, (M (env#loc x))]
+                | S _ -> [Mov (s, eax); Mov (eax, (M (env#loc x)))]
+                | R _ -> [Mov (s, (M (env#loc x)))]
                 | _   -> failwith "WUT?!")
       | BINOP op ->
           let x, y, env = env#pop2 in
@@ -132,7 +133,7 @@ let rec compile env = function
               ]
             | "<" | ">" | "<=" | ">=" | "==" | "!=" ->
               [
-                Binop ("^", eax, eax);
+                Mov (L 0, eax);
                 Mov (x, edx);
                 Binop ("cmp", edx, y);
                 Set (suffix op, "%al");
@@ -142,14 +143,14 @@ let rec compile env = function
               [
                 Mov (y, eax);
                 Binop (op, x, eax);
-                Binop ("^", eax, eax);
+                Mov (L 0, eax);
                 Set ("ne", "%al");
                 Mov (eax, y)
               ]
             | "&&" ->
               [
-                Binop ("^", eax, eax);
-                Binop ("^", edx, edx);
+                Mov (L 0, eax);
+                Mov (L 0, edx);
                 Binop ("cmp", x, eax);
                 Set ("ne", "%al");
                 Binop ("cmp", y, edx);
